@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sensei Classroom — daily practice in math, reading and thinking</title>
+<meta name="description" content="Ten minutes of guided practice a day in math, reading and thinking. Built so the basics become automatic and attention is left over for the hard parts.">
+<meta property="og:title" content="Sensei Classroom">
+<meta property="og:description" content="Ten minutes of guided practice a day in math, reading and thinking.">
+<meta property="og:url" content="https://senseiclassroom.com">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2315203A'/%3E%3Cpath d='M8 11h16M8 16h11M8 21h16' stroke='%23EFF1EE' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Literata:opsz,wght@7..72,400;7..72,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFF1EE;
+    --panel:#E5E9E4;
+    --ink:#15203A;
+    --indigo:#2B4479;
+    --moss:#54762F;
+    --clay:#9A5330;
+    --rule:rgba(21,32,58,.16);
+    --soft:rgba(21,32,58,.66);
+    --measure:60ch;
+  }
+
+  *{box-sizing:border-box}
+
+  html{-webkit-text-size-adjust:100%}
+
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Atkinson Hyperlegible",system-ui,-apple-system,sans-serif;
+    font-size:17px;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  h1,h2,h3{
+    font-family:Literata,Georgia,serif;
+    font-weight:400;
+    margin:0;
+    letter-spacing:-.018em;
+    line-height:1.1;
+  }
+
+  p{margin:0 0 1.1em}
+  p:last-child{margin-bottom:0}
+
+  a{color:var(--indigo)}
+
+  .wrap{
+    max-width:1140px;
+    margin:0 auto;
+    padding:0 24px;
+  }
+
+  .measure{max-width:var(--measure)}
+
+  :focus-visible{
+    outline:2.5px solid var(--indigo);
+    outline-offset:3px;
+    border-radius:2px;
+  }
+
+  /* ---------- masthead ---------- */
+
+  .masthead{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:24px;
+    padding:26px 0 0;
+  }
+
+  .mark{
+    font-family:Literata,Georgia,serif;
+    font-size:1.2rem;
+    letter-spacing:-.02em;
+    text-decoration:none;
+    color:var(--ink);
+  }
+
+  .masthead nav{
+    display:flex;
+    gap:26px;
+    font-size:.95rem;
+  }
+
+  .masthead nav a{
+    color:var(--soft);
+    text-decoration:none;
+    padding-bottom:2px;
+    border-bottom:1.5px solid transparent;
+  }
+
+  .masthead nav a:hover{
+    color:var(--ink);
+    border-bottom-color:var(--ink);
+  }
+
+  @media (max-width:760px){
+    .masthead nav{display:none}
+  }
+
+  /* ---------- hero ---------- */
+
+  .hero{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:48px;
+    padding:64px 0 86px;
+    align-items:start;
+  }
+
+  @media (min-width:960px){
+    .hero{
+      grid-template-columns:1.05fr .95fr;
+      gap:72px;
+      padding:94px 0 112px;
+    }
+  }
+
+  .hero h1{
+    font-size:clamp(2.55rem,5.6vw,4.1rem);
+    line-height:1.04;
+    margin-bottom:26px;
+  }
+
+  .lede{
+    font-size:1.15rem;
+    color:var(--soft);
+    max-width:46ch;
+    margin-bottom:32px;
+  }
+
+  .actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px 22px;
+    align-items:center;
+  }
+
+  .btn{
+    display:inline-block;
+    background:var(--ink);
+    color:var(--paper);
+    text-decoration:none;
+    font-size:1rem;
+    font-weight:700;
+    padding:14px 26px;
+    border-radius:3px;
+    border:none;
+    cursor:pointer;
+    font-family:inherit;
+  }
+
+  .btn:hover{background:var(--indigo)}
+
+  .btn-quiet{
+    color:var(--soft);
+    text-decoration:none;
+    font-size:.98rem;
+    border-bottom:1.5px solid var(--rule);
+    padding-bottom:2px;
+  }
+
+  .btn-quiet:hover{color:var(--ink);border-bottom-color:var(--ink)}
+
+  /* ---------- drill ---------- */
+
+  .drill{
+    background:var(--panel);
+    border:1px solid var(--rule);
+    border-radius:4px;
+    padding:28px 26px 24px;
+  }
+
+  .drill-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:16px;
+    font-size:.92rem;
+    color:var(--soft);
+    margin-bottom:28px;
+  }
+
+  .pips{display:flex;gap:6px}
+
+  .pip{
+    width:9px;height:9px;
+    border-radius:50%;
+    border:1.5px solid var(--soft);
+  }
+
+  .pip.done{background:var(--moss);border-color:var(--moss)}
+  .pip.now{background:var(--soft)}
+
+  .question{
+    font-family:Literata,Georgia,serif;
+    font-size:clamp(1.35rem,3vw,1.75rem);
+    line-height:1.3;
+    min-height:3.6em;
+    display:flex;
+    align-items:center;
+    margin-bottom:24px;
+  }
+
+  .opts{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+  }
+
+  .opt{
+    font-family:inherit;
+    font-size:1.1rem;
+    font-weight:700;
+    color:var(--ink);
+    background:var(--paper);
+    border:1.5px solid var(--rule);
+    border-radius:3px;
+    padding:16px 8px;
+    cursor:pointer;
+    transition:background .12s ease,border-color .12s ease;
+  }
+
+  .opt:hover:not(:disabled){border-color:var(--ink)}
+  .opt:disabled{cursor:default}
+
+  .opt.right{
+    background:var(--moss);
+    border-color:var(--moss);
+    color:var(--paper);
+  }
+
+  .opt.wrong{
+    background:var(--clay);
+    border-color:var(--clay);
+    color:var(--paper);
+  }
+
+  .drill-note{
+    margin-top:18px;
+    font-size:.92rem;
+    color:var(--soft);
+    min-height:1.6em;
+  }
+
+  .done-head{
+    font-family:Literata,Georgia,serif;
+    font-size:1.5rem;
+    line-height:1.3;
+    margin-bottom:12px;
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none !important;animation:none !important}
+  }
+
+  /* ---------- sections ---------- */
+
+  .section{
+    padding:76px 0;
+    border-top:1px solid var(--rule);
+  }
+
+  .section h2{
+    font-size:clamp(1.85rem,3.3vw,2.5rem);
+    margin-bottom:28px;
+    max-width:20ch;
+  }
+
+  .section-prose{
+    font-size:1.08rem;
+    max-width:var(--measure);
+    color:var(--soft);
+  }
+
+  .section-prose strong{color:var(--ink);font-weight:400}
+
+  /* ---------- strands ---------- */
+
+  .strand{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:14px;
+    padding:34px 0;
+    border-top:1px solid var(--rule);
+  }
+
+  .strand:first-of-type{border-top:none;padding-top:8px}
+
+  @media (min-width:860px){
+    .strand{grid-template-columns:260px 1fr;gap:48px}
+  }
+
+  .strand h3{
+    font-size:1.65rem;
+    font-weight:400;
+  }
+
+  .strand p{color:var(--soft);max-width:54ch}
+
+  .arc{
+    list-style:none;
+    margin:16px 0 0;
+    padding:0;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:8px 0;
+    font-size:.92rem;
+    color:var(--soft);
+  }
+
+  .arc li{display:flex;align-items:center}
+
+  .arc li::after{
+    content:"";
+    width:20px;
+    height:1.5px;
+    background:var(--rule);
+    margin:0 10px;
+  }
+
+  .arc li:last-child::after{display:none}
+
+  .arc li:last-child{color:var(--ink)}
+
+  /* ---------- day sequence ---------- */
+
+  .day{
+    list-style:none;
+    margin:0;
+    padding:0;
+    display:grid;
+    gap:2px;
+    counter-reset:step;
+    max-width:760px;
+  }
+
+  .day li{
+    counter-increment:step;
+    display:grid;
+    grid-template-columns:auto 1fr;
+    gap:20px;
+    align-items:baseline;
+    padding:20px 0;
+    border-top:1px solid var(--rule);
+  }
+
+  .day li::before{
+    content:counter(step);
+    font-family:Literata,Georgia,serif;
+    font-size:1.05rem;
+    color:var(--soft);
+  }
+
+  .day h3{
+    font-size:1.1rem;
+    font-family:"Atkinson Hyperlegible",sans-serif;
+    font-weight:700;
+    letter-spacing:0;
+    margin-bottom:4px;
+  }
+
+  .day p{color:var(--soft);font-size:1rem;max-width:52ch}
+
+  .minutes{color:var(--soft);font-size:.92rem}
+
+  /* ---------- pricing ---------- */
+
+  .price-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:40px;
+    align-items:start;
+  }
+
+  @media (min-width:860px){
+    .price-grid{grid-template-columns:1fr 1fr;gap:72px}
+  }
+
+  .price-tag{
+    font-family:Literata,Georgia,serif;
+    font-size:3.2rem;
+    line-height:1;
+    margin-bottom:8px;
+  }
+
+  .price-sub{color:var(--soft);margin-bottom:26px}
+
+  .included{
+    list-style:none;
+    margin:0;
+    padding:0;
+  }
+
+  .included li{
+    padding:13px 0;
+    border-top:1px solid var(--rule);
+    color:var(--soft);
+  }
+
+  .included li:first-child{border-top:none}
+
+  /* ---------- close ---------- */
+
+  .close{
+    padding:84px 0;
+    border-top:1px solid var(--rule);
+  }
+
+  .close h2{
+    font-size:clamp(1.9rem,3.6vw,2.7rem);
+    margin-bottom:20px;
+    max-width:18ch;
+  }
+
+  footer{
+    border-top:1px solid var(--rule);
+    padding:30px 0 50px;
+    font-size:.92rem;
+    color:var(--soft);
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px 32px;
+    justify-content:space-between;
+  }
+
+  footer a{color:var(--soft)}
+  footer a:hover{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="masthead">
+    <a class="mark" href="/">Sensei Classroom</a>
+    <nav>
+      <a href="#approach">Approach</a>
+      <a href="#program">Program</a>
+      <a href="#day">A day</a>
+      <a href="#pricing">Pricing</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div>
+      <h1>Fluency is built one day at a time.</h1>
+      <p class="lede">Ten minutes of guided practice a day in math, reading and thinking — until the basics run on their own and there's attention left for the hard parts.</p>
+      <div class="actions">
+        <a class="btn" href="mailto:axelnorwood@gmail.com?subject=Sensei%20Classroom%20—%20first%20cohort">Join the first cohort</a>
+        <a class="btn-quiet" href="#program">See what's practised</a>
+      </div>
+    </div>
+
+    <div class="drill" id="drill">
+      <div class="drill-top">
+        <span id="drill-label">Try five reps</span>
+        <span class="pips" id="pips" aria-hidden="true"></span>
+      </div>
+      <div id="drill-body">
+        <div class="question" id="question"></div>
+        <div class="opts" id="opts"></div>
+        <p class="drill-note" id="note" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="wrap">
+  <section class="section" id="approach">
+    <h2>Practice is the part that gets skipped.</h2>
+    <div class="section-prose">
+      <p>A child who has to work out 7 × 8 has no attention left for the problem it appeared in. A reader still sounding out words is not following the story. <strong>Fluency is what frees up thinking.</strong></p>
+      <p>It comes from short, frequent, accurate repetition — a few minutes most days, at the right level, for long enough to stick. That's unglamorous, hard to keep up alone, and the first thing to fall away in a busy week.</p>
+      <p>Sensei Classroom is the structure around it: what to practise today, how long for, and what comes next once it's solid.</p>
+    </div>
+  </section>
+
+  <section class="section" id="program">
+    <h2>Three strands, practised together.</h2>
+
+    <div class="strand">
+      <h3>Numbers</h3>
+      <div>
+        <p>Arithmetic held in memory rather than worked out each time, then built on steadily until the same confidence carries into algebra.</p>
+        <ul class="arc">
+          <li>counting</li><li>number bonds</li><li>times tables</li><li>fractions</li><li>algebra</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="strand">
+      <h3>Words</h3>
+      <div>
+        <p>Sounds before spellings, decoding before speed, and reading before writing — each stage practised until it stops taking effort.</p>
+        <ul class="arc">
+          <li>phonics</li><li>decoding</li><li>reading aloud</li><li>comprehension</li><li>writing</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="strand">
+      <h3>Thinking</h3>
+      <div>
+        <p>Short reasoning problems that reward care over speed, so the habit of checking an answer forms alongside the habit of finding one.</p>
+        <ul class="arc">
+          <li>patterns</li><li>comparison</li><li>sequence</li><li>inference</li><li>argument</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="day">
+    <h2>What ten minutes looks like.</h2>
+    <ol class="day">
+      <li>
+        <div>
+          <h3>Warm up <span class="minutes">· 2 min</span></h3>
+          <p>Yesterday's work, repeated. Short enough to start without negotiation.</p>
+        </div>
+      </li>
+      <li>
+        <div>
+          <h3>Drill <span class="minutes">· 5 min</span></h3>
+          <p>One skill at the edge of what's comfortable, in short reps with immediate feedback.</p>
+        </div>
+      </li>
+      <li>
+        <div>
+          <h3>Stretch <span class="minutes">· 3 min</span></h3>
+          <p>One problem that uses today's skill for something larger, so the practice has a point.</p>
+        </div>
+      </li>
+      <li>
+        <div>
+          <h3>Mark the day</h3>
+          <p>The session logs itself. You see what's solid, what's slipping, and what comes next.</p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <section class="section" id="pricing">
+    <h2>One plan, cancel whenever.</h2>
+    <div class="price-grid">
+      <div>
+        <!-- SET YOUR PRICE: replace $XX below with the real monthly price -->
+        <div class="price-tag">$XX</div>
+        <p class="price-sub">per month, per learner. First two weeks free.</p>
+        <a class="btn" href="mailto:axelnorwood@gmail.com?subject=Sensei%20Classroom%20—%20first%20cohort">Join the first cohort</a>
+      </div>
+      <ul class="included">
+        <li>Daily practice across all three strands</li>
+        <li>Level set from a short placement session</li>
+        <li>Progress you can actually read, weekly</li>
+        <li>Works on a phone, tablet or laptop</li>
+        <li>Up to four learners on a family plan</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="close">
+    <h2>The first cohort starts soon.</h2>
+    <p class="section-prose">Places are limited while the program is in early development. Send us a note and we'll tell you when enrolment opens, with no obligation to take a place.</p>
+    <p style="margin-top:28px"><a class="btn" href="mailto:axelnorwood@gmail.com?subject=Sensei%20Classroom%20—%20first%20cohort">Join the first cohort</a></p>
+  </section>
+
+  <footer>
+    <span>© 2026 Sensei Classroom</span>
+    <a href="mailto:axelnorwood@gmail.com">axelnorwood@gmail.com</a>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var REPS = [
+    {q:'7 × 8',                                              opts:['54','56','64'],          a:1},
+    {q:'Which word rhymes with “through”?',                  opts:['blue','rough','dough'],  a:0},
+    {q:'13 × 4',                                             opts:['42','52','56'],          a:1},
+    {q:'Ann is taller than Bo. Cal is shorter than Bo. Who is tallest?',
+                                                             opts:['Ann','Bo','Cal'],       a:0},
+    {q:'Three quarters of 20',                               opts:['12','15','16'],          a:1}
+  ];
+
+  var qEl     = document.getElementById('question');
+  var optsEl  = document.getElementById('opts');
+  var noteEl  = document.getElementById('note');
+  var pipsEl  = document.getElementById('pips');
+  var labelEl = document.getElementById('drill-label');
+  var bodyEl  = document.getElementById('drill-body');
+
+  var i = 0, right = 0, started = null, locked = false;
+
+  function pips(){
+    pipsEl.innerHTML = '';
+    for (var n = 0; n < REPS.length; n++){
+      var p = document.createElement('span');
+      p.className = 'pip' + (n < i ? ' done' : (n === i ? ' now' : ''));
+      pipsEl.appendChild(p);
+    }
+  }
+
+  function render(){
+    var rep = REPS[i];
+    locked = false;
+    labelEl.textContent = 'Rep ' + (i + 1) + ' of ' + REPS.length;
+    qEl.textContent = rep.q;
+    noteEl.textContent = '';
+    optsEl.innerHTML = '';
+    rep.opts.forEach(function(text, k){
+      var b = document.createElement('button');
+      b.className = 'opt';
+      b.type = 'button';
+      b.textContent = text;
+      b.addEventListener('click', function(){ choose(k, b); });
+      optsEl.appendChild(b);
+    });
+    pips();
+  }
+
+  function choose(k, btn){
+    if (locked) return;
+    locked = true;
+    if (started === null) started = Date.now();
+
+    var rep = REPS[i];
+    var buttons = optsEl.querySelectorAll('.opt');
+    for (var n = 0; n < buttons.length; n++) buttons[n].disabled = true;
+
+    if (k === rep.a){
+      right++;
+      btn.className = 'opt right';
+      noteEl.textContent = 'Correct.';
+    } else {
+      btn.className = 'opt wrong';
+      buttons[rep.a].className = 'opt right';
+      noteEl.textContent = 'Not this time — the answer is ' + rep.opts[rep.a] + '.';
+    }
+
+    setTimeout(function(){
+      i++;
+      if (i < REPS.length) render(); else finish();
+    }, 900);
+  }
+
+  function finish(){
+    var secs = started ? Math.max(1, Math.round((Date.now() - started) / 1000)) : 0;
+    pips();
+    bodyEl.innerHTML = '';
+
+    var h = document.createElement('div');
+    h.className = 'done-head';
+    h.textContent = right + ' of ' + REPS.length + ' right, in ' + secs + ' seconds.';
+
+    var p = document.createElement('p');
+    p.className = 'drill-note';
+    p.style.minHeight = '0';
+    p.textContent = 'A real session runs ten minutes — around a hundred reps, pitched at the level where they are actually working.';
+
+    var a = document.createElement('a');
+    a.className = 'btn';
+    a.style.marginTop = '20px';
+    a.href = 'mailto:axelnorwood@gmail.com?subject=Sensei%20Classroom%20—%20first%20cohort';
+    a.textContent = 'Join the first cohort';
+
+    var again = document.createElement('button');
+    again.className = 'btn-quiet';
+    again.type = 'button';
+    again.style.cssText = 'margin-left:22px;background:none;border:none;border-bottom:1.5px solid var(--rule);font-family:inherit;cursor:pointer';
+    again.textContent = 'Try again';
+    again.addEventListener('click', function(){
+      i = 0; right = 0; started = null;
+      bodyEl.innerHTML = '';
+      bodyEl.appendChild(qEl);
+      bodyEl.appendChild(optsEl);
+      bodyEl.appendChild(noteEl);
+      render();
+    });
+
+    var row = document.createElement('p');
+    row.style.cssText = 'margin:22px 0 0;display:flex;align-items:center;flex-wrap:wrap;gap:12px 0';
+    row.appendChild(a);
+    row.appendChild(again);
+
+    bodyEl.appendChild(h);
+    bodyEl.appendChild(p);
+    bodyEl.appendChild(row);
+
+    labelEl.textContent = 'Done';
+  }
+
+  render();
+})();
+</script>
+
+</body>
+</html>
