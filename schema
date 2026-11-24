@@ -1,0 +1,231 @@
+-- ============================================================
+--  Sensei Classroom — database setup
+--
+--  Paste this whole file into Supabase:
+--    your project  ->  SQL Editor  ->  New query  ->  Run
+--
+--  It is safe to run once. Running it twice will error on the
+--  tables that already exist, which is harmless.
+--
+--  Access rules, in plain words:
+--    • a parent sees their own children and nobody else's
+--    • you (staff) see everyone
+--    • nobody can read another family's data, even with the
+--      public key from your website
+-- ============================================================
+
+
+-- ---------- who is staff --------------------------------------------------
+-- You. Add your own user id here after you first sign up (see step 2
+-- at the bottom of this file).
+
+create table if not exists staff (
+  user_id    uuid primary key references auth.users(id) on delete cascade,
+  added_at   timestamptz not null default now()
+);
+
+-- Checked by every policy below. security definer lets it read the staff
+-- table without tripping over that table's own access rules.
+create or replace function is_staff()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (select 1 from staff where user_id = auth.uid());
+$$;
+
+
+-- ---------- learners ------------------------------------------------------
+-- One row per child. The account belongs to the parent, which keeps
+-- children from holding accounts of their own.
+
+create table if not exists learners (
+  id            uuid primary key default gen_random_uuid(),
+  parent_id     uuid not null references auth.users(id) on delete cascade,
+  name          text not null,
+  school_year   int,
+  started_on    date not null default current_date,
+  active        boolean not null default true,
+  created_at    timestamptz not null default now()
+);
+
+create index if not exists learners_parent_idx on learners(parent_id);
+
+
+-- ---------- progress ------------------------------------------------------
+-- The memory of the whole system: one row per child per item.
+-- Mirrors the shape the practice engine already writes.
+
+create table if not exists item_progress (
+  learner_id   uuid not null references learners(id) on delete cascade,
+  item_id      text not null,
+  box          int  not null default 0,
+  due_at       timestamptz,
+  right_count  int  not null default 0,
+  wrong_count  int  not null default 0,
+  seen         int  not null default 0,
+  avg_ms       int  not null default 0,
+  updated_at   timestamptz not null default now(),
+  primary key (learner_id, item_id)
+);
+
+create index if not exists progress_due_idx on item_progress(learner_id, due_at);
+
+
+-- ---------- sessions ------------------------------------------------------
+-- One row each time a child finishes a session. This is what tells you
+-- a family has gone quiet, which is the thing worth a message.
+
+create table if not exists sessions (
+  id           bigserial primary key,
+  learner_id   uuid not null references learners(id) on delete cascade,
+  started_at   timestamptz not null default now(),
+  asked        int not null,
+  right_count  int not null,
+  seconds      int not null
+);
+
+create index if not exists sessions_learner_idx on sessions(learner_id, started_at desc);
+
+
+-- ---------- notes ---------------------------------------------------------
+-- What you wrote before and after the monthly call. Parent-visible notes
+-- are shared; private ones are yours alone.
+
+create table if not exists notes (
+  id          bigserial primary key,
+  learner_id  uuid not null references learners(id) on delete cascade,
+  author_id   uuid references auth.users(id) on delete set null,
+  body        text not null,
+  shared      boolean not null default false,
+  created_at  timestamptz not null default now()
+);
+
+create index if not exists notes_learner_idx on notes(learner_id, created_at desc);
+
+
+-- ============================================================
+--  Access rules
+--  Nothing below is optional. Without these, the public key on
+--  your website would let anyone read every family's data.
+-- ============================================================
+
+alter table staff          enable row level security;
+alter table learners       enable row level security;
+alter table item_progress  enable row level security;
+alter table sessions       enable row level security;
+alter table notes          enable row level security;
+
+
+-- staff list: readable only by staff, writable only in the dashboard
+drop policy if exists staff_read on staff;
+create policy staff_read on staff
+  for select using (is_staff());
+
+
+-- learners
+drop policy if exists learners_read on learners;
+create policy learners_read on learners
+  for select using (parent_id = auth.uid() or is_staff());
+
+drop policy if exists learners_insert on learners;
+create policy learners_insert on learners
+  for insert with check (parent_id = auth.uid());
+
+drop policy if exists learners_update on learners;
+create policy learners_update on learners
+  for update using (parent_id = auth.uid() or is_staff())
+          with check (parent_id = auth.uid() or is_staff());
+
+drop policy if exists learners_delete on learners;
+create policy learners_delete on learners
+  for delete using (parent_id = auth.uid());
+
+
+-- a reusable test: does this learner belong to me, or am I staff?
+create or replace function may_touch(l uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select is_staff()
+      or exists (select 1 from learners
+                  where id = l and parent_id = auth.uid());
+$$;
+
+
+-- progress
+drop policy if exists progress_read on item_progress;
+create policy progress_read on item_progress
+  for select using (may_touch(learner_id));
+
+drop policy if exists progress_write on item_progress;
+create policy progress_write on item_progress
+  for insert with check (may_touch(learner_id));
+
+drop policy if exists progress_update on item_progress;
+create policy progress_update on item_progress
+  for update using (may_touch(learner_id))
+          with check (may_touch(learner_id));
+
+
+-- sessions
+drop policy if exists sessions_read on sessions;
+create policy sessions_read on sessions
+  for select using (may_touch(learner_id));
+
+drop policy if exists sessions_write on sessions;
+create policy sessions_write on sessions
+  for insert with check (may_touch(learner_id));
+
+
+-- Notes run both ways. A parent can write about their own child
+-- ("he was tired all week"), and reads back anything you chose to
+-- share plus whatever they wrote themselves. Your private notes
+-- stay private.
+drop policy if exists notes_read on notes;
+create policy notes_read on notes
+  for select using (
+    is_staff()
+    or author_id = auth.uid()
+    or (shared and exists (select 1 from learners
+                            where id = notes.learner_id
+                              and parent_id = auth.uid()))
+  );
+
+drop policy if exists notes_write on notes;
+create policy notes_write on notes
+  for insert with check (
+    is_staff()
+    or (author_id = auth.uid() and may_touch(learner_id))
+  );
+
+drop policy if exists notes_update on notes;
+create policy notes_update on notes
+  for update using (is_staff()) with check (is_staff());
+
+
+-- ============================================================
+--  After running this
+--
+--  1. Sign up on your own site with your real email, so that
+--     Supabase creates a user for you.
+--
+--  2. Come back to the SQL Editor and run:
+--
+--        insert into staff (user_id)
+--        select id from auth.users where email = 'you@example.com';
+--
+--     That is what makes you staff. Until you do it, even you
+--     cannot see other families' data — which is the point.
+--
+--  3. Check it worked:
+--
+--        select is_staff();
+--
+--     It should return true.
+-- ============================================================
