@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Practice — Sensei Classroom</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2315203A'/%3E%3Cpath d='M8 11h16M8 16h11M8 21h16' stroke='%23EFF1EE' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Literata:opsz,wght@7..72,400;7..72,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFF1EE; --panel:#E5E9E4; --ink:#15203A; --indigo:#2B4479;
+    --moss:#54762F; --clay:#9A5330; --rule:rgba(21,32,58,.16); --soft:rgba(21,32,58,.66);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:"Atkinson Hyperlegible",system-ui,sans-serif;
+    display:flex; flex-direction:column; min-height:100%;
+    -webkit-font-smoothing:antialiased;
+    -webkit-tap-highlight-color:transparent;
+  }
+  h1,h2{font-family:Literata,Georgia,serif;font-weight:400;margin:0;letter-spacing:-.018em;line-height:1.15}
+  :focus-visible{outline:3px solid var(--indigo);outline-offset:3px;border-radius:3px}
+
+  .bar{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:16px 22px;border-bottom:1px solid var(--rule);font-size:.95rem;color:var(--soft);
+  }
+  .bar a{color:var(--soft);text-decoration:none}
+  .bar a:hover{color:var(--ink)}
+
+  .track{height:4px;background:var(--panel);position:relative}
+  .track i{display:block;height:100%;background:var(--moss);width:0;transition:width .25s ease}
+
+  main{
+    flex:1;display:flex;flex-direction:column;justify-content:center;
+    width:100%;max-width:760px;margin:0 auto;padding:28px 22px 44px;
+  }
+
+  .screen{display:none}
+  .screen.on{display:block}
+
+  /* ---- start ---- */
+  .hello{font-size:clamp(2rem,6vw,2.9rem);margin-bottom:14px}
+  .sub{color:var(--soft);font-size:1.1rem;margin:0 0 30px;max-width:46ch}
+
+  .summary{display:flex;flex-wrap:wrap;gap:28px 46px;margin:0 0 36px;padding:22px 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+  .summary div{min-width:120px}
+  .summary b{display:block;font-family:Literata,Georgia,serif;font-size:1.9rem;font-weight:400;line-height:1.1}
+  .summary span{font-size:.92rem;color:var(--soft)}
+
+  .big{
+    display:inline-block;font-family:inherit;font-size:1.25rem;font-weight:700;
+    background:var(--ink);color:var(--paper);border:none;border-radius:4px;
+    padding:20px 44px;cursor:pointer;
+  }
+  .big:hover{background:var(--indigo)}
+
+  .plain{
+    background:none;border:none;font-family:inherit;font-size:.95rem;color:var(--soft);
+    cursor:pointer;padding:8px 0;border-bottom:1.5px solid var(--rule);margin-left:26px;
+  }
+  .plain:hover{color:var(--ink);border-bottom-color:var(--ink)}
+
+  /* ---- session ---- */
+  .count{font-size:.95rem;color:var(--soft);margin-bottom:26px}
+
+  .prompt{
+    font-family:Literata,Georgia,serif;
+    font-size:clamp(2rem,7vw,3.4rem); line-height:1.25;
+    min-height:2.6em; display:flex; align-items:center;
+    margin-bottom:34px;
+  }
+
+  .choices{display:grid;gap:14px}
+  @media (min-width:620px){ .choices{grid-template-columns:repeat(3,1fr)} }
+
+  .choice{
+    font-family:inherit; font-size:1.5rem; font-weight:700; color:var(--ink);
+    background:var(--panel); border:2px solid transparent; border-radius:5px;
+    padding:26px 12px; cursor:pointer; position:relative;
+    transition:border-color .1s ease;
+  }
+  .choice:hover:not(:disabled){border-color:var(--ink)}
+  .choice:disabled{cursor:default}
+  .choice .n{
+    position:absolute;top:7px;left:11px;font-size:.78rem;font-weight:400;color:var(--soft);
+  }
+  .choice.yes{background:var(--moss);color:var(--paper);border-color:var(--moss)}
+  .choice.yes .n{color:rgba(255,255,255,.65)}
+  .choice.no{background:var(--clay);color:var(--paper);border-color:var(--clay)}
+  .choice.no .n{color:rgba(255,255,255,.65)}
+
+  .says{margin-top:24px;font-size:1.1rem;min-height:1.7em;color:var(--soft)}
+  .says b{color:var(--ink);font-weight:700}
+
+  /* ---- done ---- */
+  .done-h{font-size:clamp(1.9rem,5vw,2.7rem);margin-bottom:18px}
+  .lines{list-style:none;margin:0 0 34px;padding:0;max-width:44ch}
+  .lines li{padding:14px 0;border-top:1px solid var(--rule);color:var(--soft);display:flex;justify-content:space-between;gap:20px}
+  .lines li b{color:var(--ink);font-weight:700}
+
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <a href="index.html">Sensei Classroom</a>
+  <span id="who"></span>
+</div>
+<div class="track"><i id="track"></i></div>
+
+<main>
+
+  <!-- ============ start ============ -->
+  <section class="screen on" id="s-start">
+    <h1 class="hello" id="greet">Ready to practise?</h1>
+    <p class="sub" id="start-sub"></p>
+
+    <div class="summary" id="summary"></div>
+
+    <button class="big" id="go">Start</button>
+    <button class="plain" id="wipe">Start over</button>
+  </section>
+
+  <!-- ============ session ============ -->
+  <section class="screen" id="s-run">
+    <div class="count" id="count"></div>
+    <div class="prompt" id="prompt"></div>
+    <div class="choices" id="choices"></div>
+    <p class="says" id="says" role="status" aria-live="polite"></p>
+  </section>
+
+  <!-- ============ done ============ -->
+  <section class="screen" id="s-done">
+    <h2 class="done-h" id="done-h"></h2>
+    <ul class="lines" id="lines"></ul>
+    <button class="big" id="again">Practise again</button>
+    <button class="plain" id="home">Finish</button>
+  </section>
+
+</main>
+
+<script src="items.js"></script>
+<script src="engine.js"></script>
+<script>
+(function(){
+
+  var el = function(id){ return document.getElementById(id); };
+  var show = function(id){
+    ['s-start','s-run','s-done'].forEach(function(s){
+      el(s).classList.toggle('on', s === id);
+    });
+  };
+
+  /* ---------- who is practising ---------- */
+
+  var name = localStorage.getItem('sensei:name');
+  if (!name) {
+    name = (prompt('What is your first name?') || '').trim().slice(0, 24);
+    if (name) localStorage.setItem('sensei:name', name);
+  }
+  var profile = (name || 'learner').toLowerCase().replace(/[^a-z0-9]/g, '') || 'learner';
+  el('who').textContent = name || '';
+  Engine.start(profile);
+
+  /* ---------- start screen ---------- */
+
+  function paintStart(){
+    var s = Engine.stats();
+    var due = Engine.dueCount();
+
+    el('greet').textContent = name ? ('Ready, ' + name + '?') : 'Ready to practise?';
+    el('start-sub').textContent = due > 0
+      ? (due + (due === 1 ? ' thing is' : ' things are') + ' ready to come back around today. About ten minutes.')
+      : 'Nothing is due just yet, so this one is early practice. About ten minutes.';
+
+    el('summary').innerHTML =
+      '<div><b>' + (s.math.mastered + s.phonics.mastered) + '</b><span>things you know by heart</span></div>' +
+      '<div><b>' + s.math.level + '</b><span>number level</span></div>' +
+      '<div><b>' + s.phonics.level + '</b><span>reading level</span></div>';
+
+    el('track').style.width = '0%';
+    show('s-start');
+  }
+
+  /* ---------- a session ---------- */
+
+  var queue = [], at = 0, shown = 0, right = 0, began = 0, asked = 0;
+  var movedUp = 0, requeued = {};
+
+  function shuffle(a){
+    a = a.slice();
+    for (var i = a.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function begin(){
+    queue = Engine.buildSession();
+    if (!queue.length){ paintStart(); return; }
+    at = 0; shown = 0; right = 0; movedUp = 0; requeued = {};
+    began = Date.now();
+    show('s-run');
+    ask();
+  }
+
+  function ask(){
+    var item = queue[at];
+    el('count').textContent = 'Question ' + (shown + 1) + ' of ' + queue.length;
+    el('track').style.width = (shown / queue.length * 100) + '%';
+    el('prompt').textContent = item.prompt;
+    el('says').textContent = '';
+
+    var opts = shuffle(item.options);
+    var box = el('choices');
+    box.innerHTML = '';
+    opts.forEach(function(text, i){
+      var b = document.createElement('button');
+      b.className = 'choice';
+      b.type = 'button';
+      b.innerHTML = '<span class="n">' + (i + 1) + '</span>';
+      b.appendChild(document.createTextNode(text));
+      b.dataset.value = text;
+      b.addEventListener('click', function(){ pick(text, b); });
+      box.appendChild(b);
+    });
+
+    asked = Date.now();
+  }
+
+  function pick(choice, btn){
+    var item = queue[at];
+    if (!item || btn.disabled) return;
+
+    var ms = Date.now() - asked;
+    var ok = (choice === item.answer);
+    var all = el('choices').querySelectorAll('.choice');
+    for (var i = 0; i < all.length; i++) all[i].disabled = true;
+
+    var res = Engine.answer(item.id, ok, ms);
+    if (res.moved > 0) movedUp++;
+
+    if (ok){
+      right++;
+      btn.className = 'choice yes';
+      el('says').innerHTML = res.fluent ? 'Yes — quick.' : 'Yes. A little quicker next time.';
+    } else {
+      btn.className = 'choice no';
+      for (var j = 0; j < all.length; j++){
+        if (all[j].dataset.value === item.answer) all[j].className = 'choice yes';
+      }
+      el('says').innerHTML = 'It was <b>' + item.answer + '</b>.';
+      // bring a missed item back later in the same session, once
+      if (!requeued[item.id] && Object.keys(requeued).length < 3){
+        requeued[item.id] = true;
+        queue.splice(Math.min(at + 4, queue.length), 0, item);
+      }
+    }
+
+    setTimeout(next, ok ? 750 : 1600);
+  }
+
+  function next(){
+    at++; shown++;
+    if (at < queue.length) ask();
+    else finish();
+  }
+
+  // what to call an item in a summary line
+  function label(item){
+    return item.strand === 'math' ? item.prompt : item.answer;
+  }
+
+  function finish(){
+    var secs = Math.round((Date.now() - began) / 1000);
+    var mins = Math.floor(secs / 60), rest = secs % 60;
+    var s = Engine.stats();
+
+    Store.logSession(profile, { at: Date.now(), asked: shown, right: right, secs: secs });
+
+    el('track').style.width = '100%';
+    el('done-h').textContent = right + ' of ' + shown + ' right.';
+
+    var known = s.math.mastered + s.phonics.mastered;
+
+    var rows = [
+      ['Time', (mins ? mins + ' min ' : '') + rest + ' sec'],
+      ['Moved up today', movedUp]
+    ];
+
+    // Only show the long-run total once there is something in it. A first
+    // session that ends in "0 of 82" tells a six-year-old they got nowhere.
+    if (known > 0) rows.push(['Known by heart', known]);
+
+    var weak = Engine.shaky(2);
+    if (weak.length) rows.push(['Worth another look', weak.map(label).join(' · ')]);
+
+    el('lines').innerHTML = rows.map(function(r){
+      return '<li><span>' + r[0] + '</span><b>' + r[1] + '</b></li>';
+    }).join('');
+
+    show('s-done');
+  }
+
+  /* ---------- keyboard ---------- */
+
+  document.addEventListener('keydown', function(e){
+    if (!el('s-run').classList.contains('on')) return;
+    var n = parseInt(e.key, 10);
+    if (n >= 1 && n <= 3){
+      var b = el('choices').querySelectorAll('.choice')[n - 1];
+      if (b && !b.disabled) b.click();
+    }
+  });
+
+  /* ---------- wiring ---------- */
+
+  el('go').addEventListener('click', begin);
+  el('again').addEventListener('click', begin);
+  el('home').addEventListener('click', paintStart);
+  el('wipe').addEventListener('click', function(){
+    if (confirm('Clear all progress for ' + (name || 'this learner') + '?')){
+      Engine.reset(); paintStart();
+    }
+  });
+
+  paintStart();
+
+})();
+</script>
+
+</body>
+</html>
